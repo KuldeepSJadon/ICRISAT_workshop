@@ -19,9 +19,8 @@ source: Rmd
 
 ```{r chunk_options, include=FALSE}
 source("../bin/chunk-options.R")
-knitr_fig_path("15-")
+knitr_fig_path("07-")
 ```
-
 
 ## Data analysis reports
 
@@ -71,7 +70,7 @@ mark-up language for creating web pages.
 ## Creating an R Markdown file
 
 Within RStudio, click File &rarr; New File &rarr; R Markdown and
-you'll get a dialog box like this:
+you'll get a dialogue box like this:
 
 ![](../fig/New_R_Markdown.png)
 

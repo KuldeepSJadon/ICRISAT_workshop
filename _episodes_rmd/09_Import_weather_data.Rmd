@@ -1,0 +1,287 @@
+---
+title: Importing weather data for use in modelling
+teaching: 60
+exercises: 15
+questions:
+- "How can I prepare my weather data from diferent stations and merge it?"
+- "How can I prepare my weather data for use in an analysis?"
+- "How can I save my weather data it without overwriting the raw data?"
+objectives:
+- Understand how to import real-world data
+- Understand how to merge different data sets
+- Calculate mean values from raw data for wind direction
+- Data frame manipulation including dropping and converting columns
+- Summarise weather data from a fine temporal resolution to a coarser resolution
+- Save the newly formatted data for use in further work using R
+keypoints:
+- "Use `readr` to import CSV files in place of `read.csv()`"
+- "Use `dplyr` to add new columns of data."
+- "Use `dplyr` to summarise data."
+- "Create a data set that is useful for visualisation and modelling."
+- "Wind direction is not linear, it is circular and requires special handling to average."
+source: Rmd
+---
+
+```{r chunk_options, include=FALSE}
+source("../bin/chunk-options.R")
+knitr_fig_path("09-")
+```
+
+## Libraries
+
+Load libraries that will be used for this exercise.
+
+```{r libraries, message=FALSE, warning=FALSE}
+library("ChickpeaAscoDispersal")
+library("tidyverse")
+library("lubridate")
+library("skimr")
+library("ggpubr")
+library("kableExtra")
+library("scales")
+
+theme_set(theme_pubclean(base_size = 14))
+```
+
+### Weather data
+
+Import and select only the weather data necessary for analysis from Curyo and Horsham weather stations.
+The original data are located in the "data" directory.
+Dates for events are recorded in the "data/Dispersal experiments dates.csv" file and are used to subset the weather data in this file.
+
+### Irrigation Amount Data
+
+Dr J. Fanning (AgVic) tested the irrigation system on two separate days, 2020-03-17 and 2020-03-18.
+Following is his e-mail and conclusions.
+
+> This is based on the following
+I have checked the irrigation schedules and I irrigated for 90 minutes each time for these experiments. When I irrigated it was usually below 10kph.
+
+> The team have run the test once yesterday morning and once this morning.
+It is difficult, as the wind has not been dropping down to 0-5kph and there is no wind breaks out there. Based on the forecast this will be the best we can get for at least the length of the forecast ahead.
+
+> First test showed 0.12mm per min, with 10-15kph wind
+
+> Second test showed 0.13mm per min with 10-20kph wind
+
+> Even with the variability I am confident in these figures as the wind is mainly changing where is being irrigated rather than the amount based on the testing.
+Less irrigation into the wind. We have a Northerly wind currently where as it was westerly when we irrigated so wind would have been blowing with the length of the sprinkler system so to speak.
+With the piping running East/West.
+The attached picture is orientated with North to the top of the page so shows the length running east/west which I feels reduces the variability in irrigation.
+
+Based on this, we elected to use 11&nbsp;mm as the amount of irrigation applied during the spread events at Horsham.
+
+These values are added to the data in the [Summarise weather data by event](Summarise weather data by event) code chunk for the raw weather output.
+
+## Curyo Weather Data
+
+In this first step, the data are imported and only the date and time, average wind speed and average wind direction are selected.
+
+### Import Curyo Weather Data
+
+```{r import-Curyo, message=FALSE, warning=FALSE}
+Curyo_w <-
+   read_csv(
+      system.file(
+         "extdata",
+         "Curyo_SPA_2019_weather.csv",
+         package = "ChickpeaAscoDispersal",
+         mustWork = TRUE
+      )
+   ) %>%
+   select(Time,
+          'Wind Speed - average (km/h)',
+          'Wind Direction - average (º)',
+          "Rainfall - (mm)") %>%
+   mutate(Time = dmy_hm(Time)) %>%
+   mutate(Location = "Curyo") %>%
+   select(Location, everything())
+```
+
+### Inspect the Curyo Weather Data
+
+```{r skim-Curyo}
+skim(Curyo_w)
+```
+
+## Horsham Weather Data
+
+### Import Horsham Weather Data
+
+```{r import-Horsham, message=FALSE, warning=FALSE}
+Horsham_w <-
+   read_csv(
+      system.file(
+         "extdata",
+         "Horsham_SPA_2019_weather.csv",
+         package = "ChickpeaAscoDispersal",
+         mustWork = TRUE
+      )
+   ) %>%
+   select(Time,
+          'Wind Speed - average (km/h)',
+          'Wind Direction - average (º)',
+          "Rainfall - (mm)") %>%
+   mutate(Time = dmy_hm(Time)) %>%
+   mutate(Location = "Horsham") %>%
+   select(Location, everything())
+```
+
+### Inspect Horsham Weather Data
+
+```{r skim-Horsham}
+skim(Horsham_w)
+```
+
+## Merge and Filter the Data for Events
+
+### Create the Event Data
+
+Event data have dates and times when trap plants were deployed, retrieved and assessed for each event.
+
+```{r import-event, message=FALSE}
+events <-
+   read_csv(
+      system.file(
+         "extdata",
+         "Dispersal_experiment_dates.csv",
+         package = "ChickpeaAscoDispersal",
+         mustWork = TRUE
+      )
+   ) %>%
+   mutate(`assessment date` = dmy(`assessment date`)) %>%
+   mutate(exposed = interval(`time out`, `time removed`))
+
+kable(events, format = "html", table.attr = 'class="table table-hover"')
+```
+
+### Filter and Merge the Locations' Data
+
+Filter the data removing any dates that do not have "event" data necessary for analysis.
+Because events overlap at Horsham, the dryland and irrigated sites are handled separately first, then combined.
+To do this, first `filter()`, then use `case_when()` to match the dates and times with the `events` data frame and create new variables to indicate which replicate and location, which is used to determine an event in the data.
+
+#### Horsham Irrigated
+
+```{r filter-Horsham-irrig}
+Horsham_irrg <-
+   Horsham_w %>%
+   filter(Time %within% events[1, "exposed"] |
+             Time %within% events[2, "exposed"] |
+             Time %within% events[3, "exposed"]) %>%
+   mutate(
+      Location = case_when(
+         Time %within% events[1, "exposed"] ~ events[[1, "site"]],
+         Time %within% events[2, "exposed"] ~ events[[2, "site"]],
+         Time %within% events[3, "exposed"] ~ events[[3, "site"]]
+      )
+   ) %>%
+   mutate(
+      Rep = case_when(
+         Time %within% events[1, "exposed"] ~ events[[1, "rep"]],
+         Time %within% events[2, "exposed"] ~ events[[2, "rep"]],
+         Time %within% events[3, "exposed"] ~ events[[3, "rep"]]
+      )
+   ) %>%
+   rename(site = Location, rep = Rep, time = Time) %>%
+   select(site, rep, time, everything())
+```
+
+#### Horsham Rain
+
+```{r filter-Horsham-rain}
+Horsham_rain <-
+   Horsham_w %>%
+   filter(Time %within% events[4, "exposed"] |
+             Time %within% events[5, "exposed"]) %>%
+   mutate(Location = case_when(Time %within% events[4, "exposed"] ~ events[[4, "site"]],
+                               Time %within% events[5, "exposed"] ~ events[[5, "site"]])) %>%
+   mutate(Rep = case_when(Time %within% events[4, "exposed"] ~ events[[4, "rep"]],
+                          Time %within% events[5, "exposed"] ~ events[[5, "rep"]], )) %>%
+   rename(site = Location, rep = Rep, time = Time) %>%
+   select(site, rep, time, everything())
+```
+
+#### Curyo Rain
+
+```{r filter-Curyo-rain}
+Curyo_rain <-
+   Curyo_w %>%
+   filter(Time %within% events[which(events$site == "Curyo"), "exposed"]) %>%
+   mutate(Location = case_when(Time %within% events[which(events$site == "Curyo"),
+                                                    "exposed"] ~ "Curyo")) %>%
+   mutate(Rep = case_when(Time %within% events[which(events$site == "Curyo"), "exposed"] ~
+                             events[[which(events$site == "Curyo"), "rep"]])) %>%
+   rename(site = Location, rep = Rep, time = Time) %>%
+   select(site, rep, time, everything())
+
+weather <- bind_rows(Curyo_rain, Horsham_irrg, Horsham_rain)
+```
+
+### Rename Columns and Add Other Calculations
+
+The `Wind Speed - average (km/h)` column is converted to metres per second and renamed `wind_speed`.
+The standard deviation of the wind speed and wind direction are calculated for the data.
+The columns are then reordered by `Location`, `Rep`, `Time` and the weather data.
+
+```{r rename-and-sd}
+cleaned_weather <-
+   weather %>%
+   mutate(`Wind Speed - average (km/h)` = `Wind Speed - average (km/h)` /
+             3.6) %>%
+   rename(wind_speed = `Wind Speed - average (km/h)`) %>%
+   rename(wind_direction = `Wind Direction - average (º)`) %>%
+   rename(rainfall = `Rainfall - (mm)`) %>%
+   select(site, rep, time, everything()) %>%
+   arrange(site, rep, time) %>% 
+   mutate_at(vars(site, rep), factor)
+
+glimpse(cleaned_weather)
+```
+
+### Summarise Weather Data by Event
+
+The weather data are now ready for summarising for each event that occurred.
+The resulting columns are:
+
+* mws - mean wind speed in meters per second
+
+* ws_sd - standard deviation of the wind speed
+
+* mwd - mean wind direction in degrees
+
+* wd_sd - standard deviation of the wind direction in degrees
+
+* sum_rain - total rainfall and irrigation (if applicable) during the event
+
+```{r summary-weather}
+summary_weather <-
+   cleaned_weather %>%
+   group_by(site, rep) %>%
+   summarise(
+      mws = mean(wind_speed),
+      ws_sd = sd(wind_speed),
+      max_ws = max(wind_speed),
+      min_ws = min(wind_speed),
+      mwd = circular.averaging(wind_direction),
+      sum_rain = sum(rainfall)
+   ) %>%
+   mutate(# add the 11 mm of irrigation to the summary
+      sum_rain =
+         case_when(site == "Horsham irrigated" ~ sum_rain + 11,
+                   TRUE ~ sum_rain))
+
+kable(summary_weather,
+      align = "c",
+      caption = "Summary weather data for replicated rain event (spread event) per unique site.")
+```
+
+## Save Weather Data
+
+Save weather data for use in visualisation and modelling.
+This only needs to be done once.
+
+```{r save-lesion-counts, eval=FALSE}
+save(cleaned_weather, file = "./data/cleaned_weather.rda")
+save(summary_weather, file = "./data/summary_weather.rda")
+```

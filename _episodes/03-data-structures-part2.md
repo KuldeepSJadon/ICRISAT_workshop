@@ -43,21 +43,6 @@ gapminder <- read.csv("data/gapminder_data.csv")
 ~~~
 {: .language-r}
 
-
-
-~~~
-Warning in file(file, "rt"): cannot open file 'data/gapminder_data.csv': No such
-file or directory
-~~~
-{: .warning}
-
-
-
-~~~
-Error in file(file, "rt"): cannot open the connection
-~~~
-{: .error}
-
 > ## Miscellaneous Tips
 >
 > * Another type of file you might encounter are tab-separated value files (.tsv). To specify a tab as a separator, use `"\\t"` or `read.delim()`.
@@ -95,9 +80,15 @@ str(gapminder)
 
 
 ~~~
-Error in str(gapminder): object 'gapminder' not found
+'data.frame':	1704 obs. of  6 variables:
+ $ country  : chr  "Afghanistan" "Afghanistan" "Afghanistan" "Afghanistan" ...
+ $ year     : int  1952 1957 1962 1967 1972 1977 1982 1987 1992 1997 ...
+ $ pop      : num  8425333 9240934 10267083 11537966 13079460 ...
+ $ continent: chr  "Asia" "Asia" "Asia" "Asia" ...
+ $ lifeExp  : num  28.8 30.3 32 34 36.1 ...
+ $ gdpPercap: num  779 821 853 836 740 ...
 ~~~
-{: .error}
+{: .output}
 
 An additional method for examining the structure of gapminder is to use the `summary` function. This function can be used on various objects in R. For data frames, `summary` yields a numeric, tabular, or descriptive summary of each column. Factor columns are summarized by the number of items in each level, numeric or integer columns by the descriptive statistics (quartiles and mean), and character columns by its length, class, and mode.  
 
@@ -110,9 +101,10 @@ summary(gapminder$country)
 
 
 ~~~
-Error in summary(gapminder$country): object 'gapminder' not found
+   Length     Class      Mode 
+     1704 character character 
 ~~~
-{: .error}
+{: .output}
 
 Along with the `str` and `summary` functions, we can examine individual columns of the data frame with our `typeof` function:
 
@@ -125,9 +117,9 @@ typeof(gapminder$year)
 
 
 ~~~
-Error in typeof(gapminder$year): object 'gapminder' not found
+[1] "integer"
 ~~~
-{: .error}
+{: .output}
 
 
 
@@ -139,9 +131,9 @@ typeof(gapminder$country)
 
 
 ~~~
-Error in typeof(gapminder$country): object 'gapminder' not found
+[1] "character"
 ~~~
-{: .error}
+{: .output}
 
 
 
@@ -153,9 +145,9 @@ str(gapminder$country)
 
 
 ~~~
-Error in str(gapminder$country): object 'gapminder' not found
+ chr [1:1704] "Afghanistan" "Afghanistan" "Afghanistan" "Afghanistan" ...
 ~~~
-{: .error}
+{: .output}
 
 We can also interrogate the data frame for information about its dimensions;
 remembering that `str(gapminder)` said there were 1704 observations of 6
@@ -170,9 +162,9 @@ length(gapminder)
 
 
 ~~~
-Error in eval(expr, envir, enclos): object 'gapminder' not found
+[1] 6
 ~~~
-{: .error}
+{: .output}
 
 A fair guess would have been to say that the length of a data frame would be the
 number of rows it has (1704), but this is not the case; remember, a data frame
@@ -187,9 +179,9 @@ typeof(gapminder)
 
 
 ~~~
-Error in typeof(gapminder): object 'gapminder' not found
+[1] "list"
 ~~~
-{: .error}
+{: .output}
 
 When `length` gave us 6, it's because gapminder is built out of a list of 6
 columns. To get the number of rows and columns in our dataset, try:
@@ -203,9 +195,9 @@ nrow(gapminder)
 
 
 ~~~
-Error in nrow(gapminder): object 'gapminder' not found
+[1] 1704
 ~~~
-{: .error}
+{: .output}
 
 
 
@@ -217,9 +209,9 @@ ncol(gapminder)
 
 
 ~~~
-Error in ncol(gapminder): object 'gapminder' not found
+[1] 6
 ~~~
-{: .error}
+{: .output}
 
 Or, both at once:
 
@@ -232,9 +224,9 @@ dim(gapminder)
 
 
 ~~~
-Error in eval(expr, envir, enclos): object 'gapminder' not found
+[1] 1704    6
 ~~~
-{: .error}
+{: .output}
 
 We'll also likely want to know what the titles of all the columns are, so we can
 ask for them later:
@@ -248,9 +240,9 @@ colnames(gapminder)
 
 
 ~~~
-Error in is.data.frame(x): object 'gapminder' not found
+[1] "country"   "year"      "pop"       "continent" "lifeExp"   "gdpPercap"
 ~~~
-{: .error}
+{: .output}
 
 At this stage, it's important to ask ourselves if the structure R is reporting
 matches our intuition or expectations; do the basic data types reported for each
@@ -271,9 +263,15 @@ head(gapminder)
 
 
 ~~~
-Error in head(gapminder): object 'gapminder' not found
+      country year      pop continent lifeExp gdpPercap
+1 Afghanistan 1952  8425333      Asia   28.80     779.4
+2 Afghanistan 1957  9240934      Asia   30.33     820.9
+3 Afghanistan 1962 10267083      Asia   32.00     853.1
+4 Afghanistan 1967 11537966      Asia   34.02     836.2
+5 Afghanistan 1972 13079460      Asia   36.09     740.0
+6 Afghanistan 1977 14880372      Asia   38.44     786.1
 ~~~
-{: .error}
+{: .output}
 
 > ## Challenge 3
 >

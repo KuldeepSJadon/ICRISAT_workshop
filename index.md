@@ -6,34 +6,49 @@ permalink: index.html  # Is the only page that doesn't follow the pattern /:path
 
 {% include gh_variables.html %}
 
-For guidelines on how to develop curriculum content, please visit [The Carpentries Curriculum Development Handbook](https://carpentries.github.io/curriculum-development/).
+# Training Progamme UASB & ICRISAT
+ 
+## Two Day Introduction to Using R for Mapping and Modelling Plant Disease
 
-This lesson shows how to use [The Carpentries]({{ site.carpentries_site}})
-lesson template. The materials below assume familiarity with tools such as GitHub, Markdown, and Jekyll. For more guidance, please visit the [Technological introductions](https://carpentries.github.io/curriculum-development/technological-introductions.html) section of The Carpentries Curriculum Development Handbook.
-   
-For guidelines on how to help improve our lessons and this template,
-please see [the contribution guidelines][contributing];
-for guidelines on how to set up your machine to preview changes locally,
-please see [the setup instructions]({{ page.root }}{% link setup.md %}).
+**Instructor:** A/Prof Adam H. Sparks, University of Southern Queensland
+
+**Dates:** 24 and 25 Aug. 2020
+
+## Topics to be Covered
+
+*A one-day introduction to R for non-programmers using gapminder data*
+
+The goal of this lesson is to teach novice programmers to write modular code
+and best practices for using R for data analysis.
+R is commonly used in many scientific disciplines for statistical analysis and its array of third-party
+packages.
+We find that many scientists who come to Software Carpentry workshops use R and want to learn more. The emphasis of these materials is to give attendees a strong foundation in the fundamentals of R, and to teach best practices for scientific computing: breaking down analyses into modular units, task automation, and encapsulation.
+
+Note that this workshop will focus on teaching the fundamentals of the programming language R, and will not teach statistical analysis.
+
+A variety of third party packages are used throughout this workshop.
+These are not necessarily the best, nor are they comprehensive, but they are packages we find useful, and have been chosen primarily for their usability.
 
 > ## Prerequisites
+> 
+> Have the latest versions of both [R](https://cran.r-project.org/) and [RStudio](https://rstudio.com/products/rstudio/download/#download) installed on your own computer.
 >
-> Use the `.prereq` style to specify prerequisites.
+> Understand that computers store data and instructions (programs, scripts etc.) in files.
+> Files are organised in directories (folders).
+> Know how to access files not in the working directory by specifying the path.
+> 
+> Understand basic frequentist statistical ideas, e.g. *P-values* and linear modelling.
+>
 {: .prereq}
 
-> ## Ten Things You Need To Know
+
+> ## Five Things You Need To Know
 >
-> 0.  Don't panic.
-> 1.  Create a new lesson by using GitHub Import, *not* by forking.
-> 2.  Run `bin/lesson_initialize.py` *once* in a new lesson repository to set up standard files.
-> 3.  Run `make lesson-check` to check that the lesson is formatted correctly.
-> 4.  Put lesson episodes in `_episodes` (or `_episodes_rmd` if you are writing in RMarkdown).
-> 5.  Run `make serve` to preview the lesson website locally.
-> 6.  Do *not* commit the generated HTML files in the `_site` directory.
-> 7.  Style blocks and code samples by putting `{: .stylename}` on a newline *after* the block or code.
-> 8.  Put solutions inside challenges using nested blockquotes.
-> 9.  File issues and template fixes in the [styles repository][styles],
->     and enhancements to this documentation in this one.
+> 1.  Don't panic, all the software we will install and use is free!
+> 2.  Download and install [R](https://cran.r-project.org/) on your computer.
+> 3.  Download and install [RStudio](https://rstudio.com/products/rstudio/download/#download) on your computer.
+> 4.  Be ready to ask questions and discuss ideas.
+> 5.  Have fun!
 {: .checklist}
 
 {% include links.md %}

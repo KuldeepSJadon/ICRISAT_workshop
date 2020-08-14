@@ -1,15 +1,15 @@
 ---
-title: Producing Reports With knitr
+title: "Producing Reports With knitr"
 teaching: 60
 exercises: 15
 questions:
 - "How can I integrate software and reports?"
 objectives:
-- Understand the value of writing reproducible reports
-- Learn how to recognise and compile the basic components of an R Markdown file
-- Become familiar with R code chunks, and understand their purpose, structure and options 
-- Demonstrate the use of inline chunks for weaving R outputs into text blocks, for example when discussing the results of some calculations
-- Be aware of alternative output formats to which an R Markdown file can be exported
+- " Understand the value of writing reproducible reports"
+- " Learn how to recognise and compile the basic components of an R Markdown file"
+- " Become familiar with R code chunks, and understand their purpose, structure and options"
+- " Demonstrate the use of inline chunks for weaving R outputs into text blocks, for example when discussing the results of some calculations"
+- " Be aware of alternative output formats to which an R Markdown file can be exported"
 keypoints:
 - "Mix reporting written in R Markdown with software written in R."
 - "Specify chunk options to control formatting."

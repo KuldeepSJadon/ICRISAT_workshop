@@ -1,5 +1,5 @@
 ---
-title: Fit and Compare Generalised Additive Models of Conidial Dispersal
+title: "Fit and Compare Generalised Additive Models of Conidial Dispersal"
 teaching: 60
 exercises: 15
 questions:
@@ -7,11 +7,11 @@ questions:
 - "?"
 - "?"
 objectives:
-- Join different sets of data together for building a model
-- Fit generalised additive models to data
-- Determine which factors are necessary to include in the model
-- Determine which model provides the best fit
-- Visualise a generalised additive model
+- " Join different sets of data together for building a model"
+- " Fit generalised additive models to data"
+- " Determine which factors are necessary to include in the model"
+- " Determine which model provides the best fit"
+- " Visualise a generalised additive model"
 keypoints:
 - ""
 source: Rmd

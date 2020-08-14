@@ -1,5 +1,5 @@
 ---
-title: Check if Location Affects Conidial Dispersal
+title: "Check if Location Affects Conidial Dispersal"
 teaching: 60
 exercises: 15
 questions:
@@ -7,7 +7,7 @@ questions:
 - "?"
 - "?"
 objectives:
-- 
+- ""
 keypoints:
 - ""
 source: Rmd
@@ -60,6 +60,16 @@ The first models we will look at are asking:
 
    (i) What is the estimated mean lesions per plant as each distance from the focus, given that the conditions of each spread event is nested within each site and the distance the spore travels is dependent on the spread event at each site.
    (ii) What is the estimated mean lesions per plant as each distance from the focus, given that distance is dependant on the conditions of each spread event.
+
+### Load Libraries for This Exercise
+
+```{r libraries, message=FALSE, warning=FALSE}
+library("ChickpeaAscoDispersal")
+library("tidyverse")
+library("lme4")
+```
+
+## Model Fitting
 
 ```{r lmer_mod1, message=FALSE}
 dat <-

@@ -1,5 +1,5 @@
 ---
-title: Visulalise Lesion and Weather Data
+title: "Visulalise Lesion and Weather Data"
 teaching: 60
 exercises: 15
 questions:
@@ -7,7 +7,7 @@ questions:
 - "?"
 - "?"
 objectives:
-- 
+- ""
 keypoints:
 - ""
 source: Rmd
@@ -22,7 +22,7 @@ knitr_fig_path("10-")
 knitr::opts_chunk$set(fig.width = 9.4, fig.height = 9.4)
 ```
 
-## Libraries
+### Load Libraries for This Exercise
 
 Load libraries that will be used for this exercise.
 
@@ -31,11 +31,10 @@ library("tidyverse")
 library("lubridate")
 library("clifro")
 library("viridis")
-library("ggpubr")
 library("here")
 library("ChickpeaAscoDispersal")
 
-theme_set(theme_pubclean(base_size = 14))
+theme_set(theme_bw(base_size = 14))
 ```
 
 ```{r fonts, include=FALSE, message=FALSE, eval=FALSE}

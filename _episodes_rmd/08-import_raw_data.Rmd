@@ -122,10 +122,3 @@ lesion_counts <-
 
 kable(lesion_counts)
 ```
-
-Save lesion count data for use in visualisation and modelling.
-This only needs to be done once.
-
-```{r save-lesion-counts, eval=FALSE}
-save(lesion_counts, file = "../data/lesion_counts.rda")
-```

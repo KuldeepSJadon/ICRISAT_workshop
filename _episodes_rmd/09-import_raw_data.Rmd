@@ -19,10 +19,10 @@ source: Rmd
 
 ```{r chunk_options, include=FALSE}
 source("../bin/chunk-options.R")
-knitr_fig_path("08-")
+knitr_fig_path("09-")
 ```
 
-This vignette documents the raw data import, calculation of mean lesion values and exports the new data to "data/lesion_counts.rda" for further use in visualisation and analysis.
+To get started with the Ascochyta blight (AB) data, we need to import it and  calculate mean lesion values.
 
 In the first step, the data is imported, the "m" from the `distance` column is dropped and the column is converted to numeric.
 A new column, `SpEv` (Spread Event), is created for each location and replicated event at that location. Another new column, `degrees`, is added for each transect to indicate the direction in degrees based on J. Fanning's best information.
@@ -40,16 +40,16 @@ library("tidyverse")
 
 ## Import and Inspect Lesion Data
 
+Using `read_csv()` import the lesion count data from Zenodo where they are archived.
+See [10.5281/zenodo.3842293](https://doi.org/10.5281/zenodo.3842293) for a full description of the data.
+
 ```{r import_data, message=FALSE}
 lesion_counts <-
-   read_csv(
-      system.file(
-         "extdata",
-         "lesion_counts.csv",
-         package = "ChickpeaAscoDispersal",
-         mustWork = TRUE
-      )
-   ) %>%
+   read_csv("https://zenodo.org/record/3842293/files/lesion_counts.csv?download=1")
+```
+
+
+```{r}
    mutate(site = str_remove(site, " SPA")) %>%
    mutate(distance = as.numeric(str_replace(distance, " m", ""))) %>%
    unite(SpEv, c(site, rep), remove = FALSE) %>%

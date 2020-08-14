@@ -1,7 +1,7 @@
 ---
 title: "Importing weather data for use in modelling"
-teaching: 60
-exercises: 15
+teaching: 15
+exercises: 10
 questions:
 - "How can I prepare my weather data from diferent stations and merge it?"
 - "How can I prepare my weather data for use in an analysis?"
@@ -45,8 +45,7 @@ theme_set(theme_bw(base_size = 14))
 ### Weather data
 
 Import and select only the weather data necessary for analysis from Curyo and Horsham weather stations.
-The original data are located in the "data" directory.
-Dates for events are recorded in the "data/Dispersal experiments dates.csv" file and are used to subset the weather data in this file.
+Dates for events are recorded in the "Dispersal experiments dates.csv" file and are used to subset the weather data in the weather data file.
 
 ### Irrigation Amount Data
 
@@ -75,19 +74,19 @@ These values are added to the data in the [Summarise weather data by event](Summ
 ## Curyo Weather Data
 
 In this first step, the data are imported and only the date and time, average wind speed and average wind direction are selected.
+The data are once again downloaded from the Zenodo archive, [10.5281/zenodo.3842293](https://doi.org/10.5281/zenodo.3842293).
 
 ### Import Curyo Weather Data
 
 ```{r import-Curyo, message=FALSE, warning=FALSE}
 Curyo_w <-
-   read_csv(
-      system.file(
-         "extdata",
-         "Curyo_SPA_2019_weather.csv",
-         package = "ChickpeaAscoDispersal",
-         mustWork = TRUE
-      )
-   ) %>%
+   read_csv("https://zenodo.org/record/3842293/files/Curyo_SPA_2019_weather.csv?download=1")
+head(Curyo_w)
+```
+
+Select only the columns we need, convert dates to a date class, add the location, "Curyo" and make it the first column in the data frame.
+
+```{r}
    select(Time,
           'Wind Speed - average (km/h)',
           'Wind Direction - average (º)',
@@ -105,49 +104,53 @@ skim(Curyo_w)
 
 ## Horsham Weather Data
 
-### Import Horsham Weather Data
-
-```{r import-Horsham, message=FALSE, warning=FALSE}
-Horsham_w <-
-   read_csv(
-      system.file(
-         "extdata",
-         "Horsham_SPA_2019_weather.csv",
-         package = "ChickpeaAscoDispersal",
-         mustWork = TRUE
-      )
-   ) %>%
-   select(Time,
-          'Wind Speed - average (km/h)',
-          'Wind Direction - average (º)',
-          "Rainfall - (mm)") %>%
-   mutate(Time = dmy_hm(Time)) %>%
-   mutate(Location = "Horsham") %>%
-   select(Location, everything())
-```
-
-### Inspect Horsham Weather Data
-
-```{r skim-Horsham}
-skim(Horsham_w)
-```
+> ## Challenge 1
+>
+> The Horsham weather data are formatted in the same way as the Curyo data.
+> Find the correct URL and  download the data for Horsham and format to match
+> the Curyo data using pipes to do it one step.
+>
+> > ## Solution to Challenge 1
+> >```{r}
+> >Horsham_w <-
+> >   read_csv("https://zenodo.org/record/3842293/files/Horsham_SPA_2019_weather.csv?download=1") %>%
+> >   select(Time,
+> >          'Wind Speed - average (km/h)',
+> >          'Wind Direction - average (º)',
+> >          "Rainfall - (mm)") %>%
+> >   mutate(Time = dmy_hm(Time)) %>%
+> >   mutate(Location = "Horsham") %>%
+> >   select(Location, everything())
+> > ```
+> {: .solution}
+>
+> # Challenge 2
+> 
+> Inspect the Horsham data to make sure that the structure is as you expect it to be.
+> It should match the Curyo data.
+>
+> ## Solution to Challenge 2
+> >```{r}
+> >skim(Horsham_w)
+> >```
+> >{: .solution}
+{: .challenge}
 
 ## Merge and Filter the Data for Events
 
 ### Create the Event Data
 
 Event data have dates and times when trap plants were deployed, retrieved and assessed for each event.
+These data will be downloaded from the Zenodo archive as well.
+
+1. Download using `read_csv()`.
+2. Change "assessment date" to a date class.
+3. Create a new column called "exposed" using the `interval()` function from `lubridate`.
+4. Inspect the final data frame.
 
 ```{r import-event, message=FALSE}
 events <-
-   read_csv(
-      system.file(
-         "extdata",
-         "Dispersal_experiment_dates.csv",
-         package = "ChickpeaAscoDispersal",
-         mustWork = TRUE
-      )
-   ) %>%
+   read_csv("https://zenodo.org/record/3842293/files/Dispersal_experiment_dates.csv?download=1") %>%
    mutate(`assessment date` = dmy(`assessment date`)) %>%
    mutate(exposed = interval(`time out`, `time removed`))
 
@@ -159,6 +162,10 @@ kable(events, format = "html", table.attr = 'class="table table-hover"')
 Filter the data removing any dates that do not have "event" data necessary for analysis.
 Because events overlap at Horsham, the dryland and irrigated sites are handled separately first, then combined.
 To do this, first `filter()`, then use `case_when()` to match the dates and times with the `events` data frame and create new variables to indicate which replicate and location, which is used to determine an event in the data.
+
+Here we use a special function, `%within%` from `lubridate` to check, "Does a date (or interval) fall within an interval?"
+
+Using `%within%` we will filter the weather data, keeping only the times and dates when the trap plants were exposed for each event and location.
 
 #### Horsham Irrigated
 
@@ -196,7 +203,7 @@ Horsham_rain <-
    mutate(Location = case_when(Time %within% events[4, "exposed"] ~ events[[4, "site"]],
                                Time %within% events[5, "exposed"] ~ events[[5, "site"]])) %>%
    mutate(Rep = case_when(Time %within% events[4, "exposed"] ~ events[[4, "rep"]],
-                          Time %within% events[5, "exposed"] ~ events[[5, "rep"]], )) %>%
+                          Time %within% events[5, "exposed"] ~ events[[5, "rep"]],)) %>%
    rename(site = Location, rep = Rep, time = Time) %>%
    select(site, rep, time, everything())
 ```
@@ -273,14 +280,4 @@ summary_weather <-
 kable(summary_weather,
       align = "c",
       caption = "Summary weather data for replicated rain event (spread event) per unique site.")
-```
-
-## Save Weather Data
-
-Save weather data for use in visualisation and modelling.
-This only needs to be done once.
-
-```{r save-lesion-counts, eval=FALSE}
-save(cleaned_weather, file = "./data/cleaned_weather.rda")
-save(summary_weather, file = "./data/summary_weather.rda")
 ```

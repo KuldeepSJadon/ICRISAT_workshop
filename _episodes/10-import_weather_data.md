@@ -46,8 +46,7 @@ theme_set(theme_bw(base_size = 14))
 ### Weather data
 
 Import and select only the weather data necessary for analysis from Curyo and Horsham weather stations.
-The original data are located in the "data" directory.
-Dates for events are recorded in the "data/Dispersal experiments dates.csv" file and are used to subset the weather data in this file.
+Dates for events are recorded in the "Dispersal experiments dates.csv" file and are used to subset the weather data in the weather data file.
 
 ### Irrigation Amount Data
 
@@ -76,20 +75,44 @@ These values are added to the data in the [Summarise weather data by event](Summ
 ## Curyo Weather Data
 
 In this first step, the data are imported and only the date and time, average wind speed and average wind direction are selected.
+The data are once again downloaded from the Zenodo archive, [10.5281/zenodo.3842293](https://doi.org/10.5281/zenodo.3842293).
 
 ### Import Curyo Weather Data
 
 
 ~~~
 Curyo_w <-
-   read_csv(
-      system.file(
-         "extdata",
-         "Curyo_SPA_2019_weather.csv",
-         package = "ChickpeaAscoDispersal",
-         mustWork = TRUE
-      )
-   ) %>%
+   read_csv("https://zenodo.org/record/3842293/files/Curyo_SPA_2019_weather.csv?download=1")
+head(Curyo_w)
+~~~
+{: .language-r}
+
+
+
+~~~
+# A tibble: 6 x 17
+  Time  `Air Temperatur… `Soil Temperatu… `Relative Humid… `Wind Speed - m…
+  <chr>            <dbl>            <dbl>            <dbl>            <dbl>
+1 22/0…             28.5             26.1             56.3                0
+2 22/0…             28.3             27.4             56.6                0
+3 22/0…             28.4             27.4             57                  0
+4 22/0…             28.4             27.5             56.9                0
+5 22/0…             28.3             27.5             56.4                0
+6 22/0…             28.4             27.6             55.7                0
+# … with 12 more variables: `Wind Speed - average (km/h)` <dbl>, `Wind Speed -
+#   maximum (km/h)` <dbl>, `Wind Direction - average (º)` <dbl>, `Solar
+#   Radiation - average (W/m^2)` <dbl>, `Sigma - average (deg)` <dbl>,
+#   `Rainfall - (mm)` <dbl>, `Voltage - minimum (V)` <dbl>, `Voltage - average
+#   (V)` <dbl>, `Voltage - maximum (V)` <dbl>, `Apparent Temperature - average
+#   (ºC)` <dbl>, `Dew Point - average (ºC)` <dbl>, `Delta T - average
+#   (ºC)` <dbl>
+~~~
+{: .output}
+
+Select only the columns we need, convert dates to a date class, add the location, "Curyo" and make it the first column in the data frame.
+
+
+~~~
    select(Time,
           'Wind Speed - average (km/h)',
           'Wind Direction - average (º)',
@@ -99,6 +122,13 @@ Curyo_w <-
    select(Location, everything())
 ~~~
 {: .language-r}
+
+
+
+~~~
+Error in select(Time, "Wind Speed - average (km/h)", "Wind Direction - average (º)", : object 'Time' not found
+~~~
+{: .error}
 
 ### Inspect the Curyo Weather Data
 
@@ -129,7 +159,7 @@ skim(Curyo_w)
   </tr>
   <tr>
    <td style="text-align:left;"> Number of columns </td>
-   <td style="text-align:left;"> 5 </td>
+   <td style="text-align:left;"> 17 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> _______________________ </td>
@@ -145,11 +175,7 @@ skim(Curyo_w)
   </tr>
   <tr>
    <td style="text-align:left;"> numeric </td>
-   <td style="text-align:left;"> 3 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> POSIXct </td>
-   <td style="text-align:left;"> 1 </td>
+   <td style="text-align:left;"> 16 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> ________________________ </td>
@@ -180,13 +206,13 @@ skim(Curyo_w)
  </thead>
 <tbody>
   <tr>
-   <td style="text-align:left;"> Location </td>
+   <td style="text-align:left;"> Time </td>
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 5 </td>
-   <td style="text-align:right;"> 5 </td>
+   <td style="text-align:right;"> 16 </td>
+   <td style="text-align:right;"> 16 </td>
    <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 43473 </td>
    <td style="text-align:right;"> 0 </td>
   </tr>
 </tbody>
@@ -213,17 +239,82 @@ skim(Curyo_w)
  </thead>
 <tbody>
   <tr>
+   <td style="text-align:left;"> Air Temperature - average (ºC) </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 14.16 </td>
+   <td style="text-align:right;"> 7.39 </td>
+   <td style="text-align:right;"> -0.90 </td>
+   <td style="text-align:right;"> 8.80 </td>
+   <td style="text-align:right;"> 12.90 </td>
+   <td style="text-align:right;"> 18.50 </td>
+   <td style="text-align:right;"> 41.30 </td>
+   <td style="text-align:left;"> ▃▇▅▂▁ </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Soil Temperature - average (ºC) </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 16.81 </td>
+   <td style="text-align:right;"> 5.96 </td>
+   <td style="text-align:right;"> 5.50 </td>
+   <td style="text-align:right;"> 11.70 </td>
+   <td style="text-align:right;"> 16.50 </td>
+   <td style="text-align:right;"> 21.10 </td>
+   <td style="text-align:right;"> 41.80 </td>
+   <td style="text-align:left;"> ▇▇▆▁▁ </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Relative Humidity - average (%) </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 66.13 </td>
+   <td style="text-align:right;"> 26.50 </td>
+   <td style="text-align:right;"> 4.00 </td>
+   <td style="text-align:right;"> 44.00 </td>
+   <td style="text-align:right;"> 70.40 </td>
+   <td style="text-align:right;"> 90.30 </td>
+   <td style="text-align:right;"> 99.90 </td>
+   <td style="text-align:left;"> ▂▃▃▅▇ </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Wind Speed - minimum (km/h) </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 4.69 </td>
+   <td style="text-align:right;"> 4.80 </td>
+   <td style="text-align:right;"> 0.00 </td>
+   <td style="text-align:right;"> 0.00 </td>
+   <td style="text-align:right;"> 3.74 </td>
+   <td style="text-align:right;"> 6.95 </td>
+   <td style="text-align:right;"> 33.84 </td>
+   <td style="text-align:left;"> ▇▂▁▁▁ </td>
+  </tr>
+  <tr>
    <td style="text-align:left;"> Wind Speed - average (km/h) </td>
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 9.33 </td>
    <td style="text-align:right;"> 7.46 </td>
-   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0.00 </td>
    <td style="text-align:right;"> 3.85 </td>
    <td style="text-align:right;"> 7.78 </td>
    <td style="text-align:right;"> 13.46 </td>
-   <td style="text-align:right;"> 55.3 </td>
+   <td style="text-align:right;"> 55.30 </td>
    <td style="text-align:left;"> ▇▃▁▁▁ </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Wind Speed - maximum (km/h) </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 15.57 </td>
+   <td style="text-align:right;"> 11.29 </td>
+   <td style="text-align:right;"> 0.00 </td>
+   <td style="text-align:right;"> 6.95 </td>
+   <td style="text-align:right;"> 13.43 </td>
+   <td style="text-align:right;"> 22.00 </td>
+   <td style="text-align:right;"> 427.10 </td>
+   <td style="text-align:left;"> ▇▁▁▁▁ </td>
   </tr>
   <tr>
    <td style="text-align:left;"> Wind Direction - average (º) </td>
@@ -231,12 +322,38 @@ skim(Curyo_w)
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 165.15 </td>
    <td style="text-align:right;"> 142.04 </td>
-   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0.00 </td>
    <td style="text-align:right;"> 7.85 </td>
    <td style="text-align:right;"> 158.55 </td>
    <td style="text-align:right;"> 307.60 </td>
-   <td style="text-align:right;"> 359.9 </td>
+   <td style="text-align:right;"> 359.89 </td>
    <td style="text-align:left;"> ▇▁▁▃▆ </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Solar Radiation - average (W/m^2) </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 195.72 </td>
+   <td style="text-align:right;"> 298.32 </td>
+   <td style="text-align:right;"> 0.00 </td>
+   <td style="text-align:right;"> 0.00 </td>
+   <td style="text-align:right;"> 0.00 </td>
+   <td style="text-align:right;"> 327.00 </td>
+   <td style="text-align:right;"> 1301.00 </td>
+   <td style="text-align:left;"> ▇▂▁▁▁ </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Sigma - average (deg) </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 28.67 </td>
+   <td style="text-align:right;"> 24.48 </td>
+   <td style="text-align:right;"> 0.00 </td>
+   <td style="text-align:right;"> 6.19 </td>
+   <td style="text-align:right;"> 22.77 </td>
+   <td style="text-align:right;"> 45.44 </td>
+   <td style="text-align:right;"> 102.76 </td>
+   <td style="text-align:left;"> ▇▅▃▂▁ </td>
   </tr>
   <tr>
    <td style="text-align:left;"> Rainfall - (mm) </td>
@@ -244,268 +361,348 @@ skim(Curyo_w)
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.01 </td>
    <td style="text-align:right;"> 0.07 </td>
-   <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;"> 0.00 </td>
    <td style="text-align:right;"> 0.00 </td>
    <td style="text-align:right;"> 0.00 </td>
-   <td style="text-align:right;"> 3.8 </td>
+   <td style="text-align:right;"> 0.00 </td>
+   <td style="text-align:right;"> 3.80 </td>
    <td style="text-align:left;"> ▇▁▁▁▁ </td>
   </tr>
-</tbody>
-</table>
-
-
-**Variable type: POSIXct**
-
-<table>
- <thead>
   <tr>
-   <th style="text-align:left;"> skim_variable </th>
-   <th style="text-align:right;"> n_missing </th>
-   <th style="text-align:right;"> complete_rate </th>
-   <th style="text-align:left;"> min </th>
-   <th style="text-align:left;"> max </th>
-   <th style="text-align:left;"> median </th>
-   <th style="text-align:right;"> n_unique </th>
-  </tr>
- </thead>
-<tbody>
-  <tr>
-   <td style="text-align:left;"> Time </td>
+   <td style="text-align:left;"> Voltage - minimum (V) </td>
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;"> 1 </td>
-   <td style="text-align:left;"> 2019-01-22 12:40:00 </td>
-   <td style="text-align:left;"> 2019-12-06 14:30:00 </td>
-   <td style="text-align:left;"> 2019-07-01 18:00:00 </td>
-   <td style="text-align:right;"> 43473 </td>
+   <td style="text-align:right;"> 13.30 </td>
+   <td style="text-align:right;"> 0.47 </td>
+   <td style="text-align:right;"> 12.53 </td>
+   <td style="text-align:right;"> 12.91 </td>
+   <td style="text-align:right;"> 13.02 </td>
+   <td style="text-align:right;"> 13.81 </td>
+   <td style="text-align:right;"> 14.33 </td>
+   <td style="text-align:left;"> ▃▇▁▅▂ </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Voltage - average (V) </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 13.35 </td>
+   <td style="text-align:right;"> 0.46 </td>
+   <td style="text-align:right;"> 12.61 </td>
+   <td style="text-align:right;"> 12.96 </td>
+   <td style="text-align:right;"> 13.07 </td>
+   <td style="text-align:right;"> 13.86 </td>
+   <td style="text-align:right;"> 14.34 </td>
+   <td style="text-align:left;"> ▅▇▁▆▂ </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Voltage - maximum (V) </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 13.38 </td>
+   <td style="text-align:right;"> 0.47 </td>
+   <td style="text-align:right;"> 12.69 </td>
+   <td style="text-align:right;"> 12.99 </td>
+   <td style="text-align:right;"> 13.08 </td>
+   <td style="text-align:right;"> 13.89 </td>
+   <td style="text-align:right;"> 14.90 </td>
+   <td style="text-align:left;"> ▇▁▅▂▁ </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Apparent Temperature - average (ºC) </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 11.55 </td>
+   <td style="text-align:right;"> 7.44 </td>
+   <td style="text-align:right;"> -4.00 </td>
+   <td style="text-align:right;"> 6.26 </td>
+   <td style="text-align:right;"> 10.29 </td>
+   <td style="text-align:right;"> 16.03 </td>
+   <td style="text-align:right;"> 40.77 </td>
+   <td style="text-align:left;"> ▃▇▃▂▁ </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Dew Point - average (ºC) </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 6.09 </td>
+   <td style="text-align:right;"> 3.98 </td>
+   <td style="text-align:right;"> -12.80 </td>
+   <td style="text-align:right;"> 3.73 </td>
+   <td style="text-align:right;"> 6.15 </td>
+   <td style="text-align:right;"> 8.63 </td>
+   <td style="text-align:right;"> 20.88 </td>
+   <td style="text-align:left;"> ▁▁▇▅▁ </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Delta T - average (ºC) </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 4.47 </td>
+   <td style="text-align:right;"> 4.35 </td>
+   <td style="text-align:right;"> 0.01 </td>
+   <td style="text-align:right;"> 1.03 </td>
+   <td style="text-align:right;"> 3.16 </td>
+   <td style="text-align:right;"> 6.77 </td>
+   <td style="text-align:right;"> 23.86 </td>
+   <td style="text-align:left;"> ▇▃▁▁▁ </td>
   </tr>
 </tbody>
 </table>
 
 ## Horsham Weather Data
 
-### Import Horsham Weather Data
-
-
-~~~
-Horsham_w <-
-   read_csv(
-      system.file(
-         "extdata",
-         "Horsham_SPA_2019_weather.csv",
-         package = "ChickpeaAscoDispersal",
-         mustWork = TRUE
-      )
-   ) %>%
-   select(Time,
-          'Wind Speed - average (km/h)',
-          'Wind Direction - average (º)',
-          "Rainfall - (mm)") %>%
-   mutate(Time = dmy_hm(Time)) %>%
-   mutate(Location = "Horsham") %>%
-   select(Location, everything())
-~~~
-{: .language-r}
-
-### Inspect Horsham Weather Data
-
-
-~~~
-skim(Horsham_w)
-~~~
-{: .language-r}
-
-
-<table style='width: auto;'
-        class='table table-condensed'>
-<caption>Data summary</caption>
- <thead>
-  <tr>
-   <th style="text-align:left;">   </th>
-   <th style="text-align:left;">   </th>
-  </tr>
- </thead>
-<tbody>
-  <tr>
-   <td style="text-align:left;"> Name </td>
-   <td style="text-align:left;"> Horsham_w </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Number of rows </td>
-   <td style="text-align:left;"> 38705 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Number of columns </td>
-   <td style="text-align:left;"> 5 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> _______________________ </td>
-   <td style="text-align:left;">  </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Column type frequency: </td>
-   <td style="text-align:left;">  </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> character </td>
-   <td style="text-align:left;"> 1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> numeric </td>
-   <td style="text-align:left;"> 3 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> POSIXct </td>
-   <td style="text-align:left;"> 1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> ________________________ </td>
-   <td style="text-align:left;">  </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Group variables </td>
-   <td style="text-align:left;"> None </td>
-  </tr>
-</tbody>
-</table>
-
-
-**Variable type: character**
-
-<table>
- <thead>
-  <tr>
-   <th style="text-align:left;"> skim_variable </th>
-   <th style="text-align:right;"> n_missing </th>
-   <th style="text-align:right;"> complete_rate </th>
-   <th style="text-align:right;"> min </th>
-   <th style="text-align:right;"> max </th>
-   <th style="text-align:right;"> empty </th>
-   <th style="text-align:right;"> n_unique </th>
-   <th style="text-align:right;"> whitespace </th>
-  </tr>
- </thead>
-<tbody>
-  <tr>
-   <td style="text-align:left;"> Location </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 7 </td>
-   <td style="text-align:right;"> 7 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 0 </td>
-  </tr>
-</tbody>
-</table>
-
-
-**Variable type: numeric**
-
-<table>
- <thead>
-  <tr>
-   <th style="text-align:left;"> skim_variable </th>
-   <th style="text-align:right;"> n_missing </th>
-   <th style="text-align:right;"> complete_rate </th>
-   <th style="text-align:right;"> mean </th>
-   <th style="text-align:right;"> sd </th>
-   <th style="text-align:right;"> p0 </th>
-   <th style="text-align:right;"> p25 </th>
-   <th style="text-align:right;"> p50 </th>
-   <th style="text-align:right;"> p75 </th>
-   <th style="text-align:right;"> p100 </th>
-   <th style="text-align:left;"> hist </th>
-  </tr>
- </thead>
-<tbody>
-  <tr>
-   <td style="text-align:left;"> Wind Speed - average (km/h) </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 8.16 </td>
-   <td style="text-align:right;"> 6.98 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 2.77 </td>
-   <td style="text-align:right;"> 6.37 </td>
-   <td style="text-align:right;"> 12.13 </td>
-   <td style="text-align:right;"> 49.39 </td>
-   <td style="text-align:left;"> ▇▃▁▁▁ </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Wind Direction - average (º) </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 164.14 </td>
-   <td style="text-align:right;"> 133.97 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 15.19 </td>
-   <td style="text-align:right;"> 160.41 </td>
-   <td style="text-align:right;"> 292.59 </td>
-   <td style="text-align:right;"> 359.89 </td>
-   <td style="text-align:left;"> ▇▂▁▅▆ </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Rainfall - (mm) </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 0.01 </td>
-   <td style="text-align:right;"> 0.07 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 0.00 </td>
-   <td style="text-align:right;"> 0.00 </td>
-   <td style="text-align:right;"> 0.00 </td>
-   <td style="text-align:right;"> 6.80 </td>
-   <td style="text-align:left;"> ▇▁▁▁▁ </td>
-  </tr>
-</tbody>
-</table>
-
-
-**Variable type: POSIXct**
-
-<table>
- <thead>
-  <tr>
-   <th style="text-align:left;"> skim_variable </th>
-   <th style="text-align:right;"> n_missing </th>
-   <th style="text-align:right;"> complete_rate </th>
-   <th style="text-align:left;"> min </th>
-   <th style="text-align:left;"> max </th>
-   <th style="text-align:left;"> median </th>
-   <th style="text-align:right;"> n_unique </th>
-  </tr>
- </thead>
-<tbody>
-  <tr>
-   <td style="text-align:left;"> Time </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:left;"> 2019-01-01 </td>
-   <td style="text-align:left;"> 2019-12-06 14:30:00 </td>
-   <td style="text-align:left;"> 2019-06-10 07:20:00 </td>
-   <td style="text-align:right;"> 38705 </td>
-  </tr>
-</tbody>
-</table>
+> ## Challenge 1
+>
+> The Horsham weather data are formatted in the same way as the Curyo data.
+> Find the correct URL and  download the data for Horsham and format to match
+> the Curyo data using pipes to do it one step.
+>
+> > ## Solution to Challenge 1
+> >
+> >~~~
+> >Horsham_w <-
+> >   read_csv("https://zenodo.org/record/3842293/files/Horsham_SPA_2019_weather.csv?download=1") %>%
+> >   select(Time,
+> >          'Wind Speed - average (km/h)',
+> >          'Wind Direction - average (º)',
+> >          "Rainfall - (mm)") %>%
+> >   mutate(Time = dmy_hm(Time)) %>%
+> >   mutate(Location = "Horsham") %>%
+> >   select(Location, everything())
+> >~~~
+> >{: .language-r}
+> >
+> >
+> >
+> >~~~
+> >Parsed with column specification:
+> >cols(
+> >  Time = col_character(),
+> >  `Air Temperature - average (ºC)` = col_double(),
+> >  `Soil Temperature - average (ºC)` = col_double(),
+> >  `Relative Humidity - average (%)` = col_double(),
+> >  `Wind Speed - minimum (km/h)` = col_double(),
+> >  `Wind Speed - average (km/h)` = col_double(),
+> >  `Wind Speed - maximum (km/h)` = col_double(),
+> >  `Wind Direction - average (º)` = col_double(),
+> >  `Solar Radiation - average (W/m^2)` = col_double(),
+> >  `Sigma - average (deg)` = col_double(),
+> >  `Rainfall - (mm)` = col_double(),
+> >  `Voltage - minimum (V)` = col_double(),
+> >  `Voltage - average (V)` = col_double(),
+> >  `Voltage - maximum (V)` = col_double(),
+> >  `Apparent Temperature - average (ºC)` = col_double(),
+> >  `Dew Point - average (ºC)` = col_double(),
+> >  `Delta T - average (ºC)` = col_double()
+> >)
+> >~~~
+> >{: .output}
+> {: .solution}
+>
+> # Challenge 2
+> 
+> Inspect the Horsham data to make sure that the structure is as you expect it to be.
+> It should match the Curyo data.
+>
+> ## Solution to Challenge 2
+> >
+> >~~~
+> >skim(Horsham_w)
+> >~~~
+> >{: .language-r}
+> >
+> >
+> ><table style='width: auto;'
+> >        class='table table-condensed'>
+> ><caption>Data summary</caption>
+> > <thead>
+> >  <tr>
+> >   <th style="text-align:left;">   </th>
+> >   <th style="text-align:left;">   </th>
+> >  </tr>
+> > </thead>
+> ><tbody>
+> >  <tr>
+> >   <td style="text-align:left;"> Name </td>
+> >   <td style="text-align:left;"> Horsham_w </td>
+> >  </tr>
+> >  <tr>
+> >   <td style="text-align:left;"> Number of rows </td>
+> >   <td style="text-align:left;"> 38705 </td>
+> >  </tr>
+> >  <tr>
+> >   <td style="text-align:left;"> Number of columns </td>
+> >   <td style="text-align:left;"> 5 </td>
+> >  </tr>
+> >  <tr>
+> >   <td style="text-align:left;"> _______________________ </td>
+> >   <td style="text-align:left;">  </td>
+> >  </tr>
+> >  <tr>
+> >   <td style="text-align:left;"> Column type frequency: </td>
+> >   <td style="text-align:left;">  </td>
+> >  </tr>
+> >  <tr>
+> >   <td style="text-align:left;"> character </td>
+> >   <td style="text-align:left;"> 1 </td>
+> >  </tr>
+> >  <tr>
+> >   <td style="text-align:left;"> numeric </td>
+> >   <td style="text-align:left;"> 3 </td>
+> >  </tr>
+> >  <tr>
+> >   <td style="text-align:left;"> POSIXct </td>
+> >   <td style="text-align:left;"> 1 </td>
+> >  </tr>
+> >  <tr>
+> >   <td style="text-align:left;"> ________________________ </td>
+> >   <td style="text-align:left;">  </td>
+> >  </tr>
+> >  <tr>
+> >   <td style="text-align:left;"> Group variables </td>
+> >   <td style="text-align:left;"> None </td>
+> >  </tr>
+> ></tbody>
+> ></table>
+> >
+> >
+> >**Variable type: character**
+> >
+> ><table>
+> > <thead>
+> >  <tr>
+> >   <th style="text-align:left;"> skim_variable </th>
+> >   <th style="text-align:right;"> n_missing </th>
+> >   <th style="text-align:right;"> complete_rate </th>
+> >   <th style="text-align:right;"> min </th>
+> >   <th style="text-align:right;"> max </th>
+> >   <th style="text-align:right;"> empty </th>
+> >   <th style="text-align:right;"> n_unique </th>
+> >   <th style="text-align:right;"> whitespace </th>
+> >  </tr>
+> > </thead>
+> ><tbody>
+> >  <tr>
+> >   <td style="text-align:left;"> Location </td>
+> >   <td style="text-align:right;"> 0 </td>
+> >   <td style="text-align:right;"> 1 </td>
+> >   <td style="text-align:right;"> 7 </td>
+> >   <td style="text-align:right;"> 7 </td>
+> >   <td style="text-align:right;"> 0 </td>
+> >   <td style="text-align:right;"> 1 </td>
+> >   <td style="text-align:right;"> 0 </td>
+> >  </tr>
+> ></tbody>
+> ></table>
+> >
+> >
+> >**Variable type: numeric**
+> >
+> ><table>
+> > <thead>
+> >  <tr>
+> >   <th style="text-align:left;"> skim_variable </th>
+> >   <th style="text-align:right;"> n_missing </th>
+> >   <th style="text-align:right;"> complete_rate </th>
+> >   <th style="text-align:right;"> mean </th>
+> >   <th style="text-align:right;"> sd </th>
+> >   <th style="text-align:right;"> p0 </th>
+> >   <th style="text-align:right;"> p25 </th>
+> >   <th style="text-align:right;"> p50 </th>
+> >   <th style="text-align:right;"> p75 </th>
+> >   <th style="text-align:right;"> p100 </th>
+> >   <th style="text-align:left;"> hist </th>
+> >  </tr>
+> > </thead>
+> ><tbody>
+> >  <tr>
+> >   <td style="text-align:left;"> Wind Speed - average (km/h) </td>
+> >   <td style="text-align:right;"> 0 </td>
+> >   <td style="text-align:right;"> 1 </td>
+> >   <td style="text-align:right;"> 8.16 </td>
+> >   <td style="text-align:right;"> 6.98 </td>
+> >   <td style="text-align:right;"> 0 </td>
+> >   <td style="text-align:right;"> 2.77 </td>
+> >   <td style="text-align:right;"> 6.37 </td>
+> >   <td style="text-align:right;"> 12.13 </td>
+> >   <td style="text-align:right;"> 49.39 </td>
+> >   <td style="text-align:left;"> ▇▃▁▁▁ </td>
+> >  </tr>
+> >  <tr>
+> >   <td style="text-align:left;"> Wind Direction - average (º) </td>
+> >   <td style="text-align:right;"> 0 </td>
+> >   <td style="text-align:right;"> 1 </td>
+> >   <td style="text-align:right;"> 164.14 </td>
+> >   <td style="text-align:right;"> 133.97 </td>
+> >   <td style="text-align:right;"> 0 </td>
+> >   <td style="text-align:right;"> 15.19 </td>
+> >   <td style="text-align:right;"> 160.41 </td>
+> >   <td style="text-align:right;"> 292.59 </td>
+> >   <td style="text-align:right;"> 359.89 </td>
+> >   <td style="text-align:left;"> ▇▂▁▅▆ </td>
+> >  </tr>
+> >  <tr>
+> >   <td style="text-align:left;"> Rainfall - (mm) </td>
+> >   <td style="text-align:right;"> 0 </td>
+> >   <td style="text-align:right;"> 1 </td>
+> >   <td style="text-align:right;"> 0.01 </td>
+> >   <td style="text-align:right;"> 0.07 </td>
+> >   <td style="text-align:right;"> 0 </td>
+> >   <td style="text-align:right;"> 0.00 </td>
+> >   <td style="text-align:right;"> 0.00 </td>
+> >   <td style="text-align:right;"> 0.00 </td>
+> >   <td style="text-align:right;"> 6.80 </td>
+> >   <td style="text-align:left;"> ▇▁▁▁▁ </td>
+> >  </tr>
+> ></tbody>
+> ></table>
+> >
+> >
+> >**Variable type: POSIXct**
+> >
+> ><table>
+> > <thead>
+> >  <tr>
+> >   <th style="text-align:left;"> skim_variable </th>
+> >   <th style="text-align:right;"> n_missing </th>
+> >   <th style="text-align:right;"> complete_rate </th>
+> >   <th style="text-align:left;"> min </th>
+> >   <th style="text-align:left;"> max </th>
+> >   <th style="text-align:left;"> median </th>
+> >   <th style="text-align:right;"> n_unique </th>
+> >  </tr>
+> > </thead>
+> ><tbody>
+> >  <tr>
+> >   <td style="text-align:left;"> Time </td>
+> >   <td style="text-align:right;"> 0 </td>
+> >   <td style="text-align:right;"> 1 </td>
+> >   <td style="text-align:left;"> 2019-01-01 </td>
+> >   <td style="text-align:left;"> 2019-12-06 14:30:00 </td>
+> >   <td style="text-align:left;"> 2019-06-10 07:20:00 </td>
+> >   <td style="text-align:right;"> 38705 </td>
+> >  </tr>
+> ></tbody>
+> ></table>
+> >{: .solution}
+{: .challenge}
 
 ## Merge and Filter the Data for Events
 
 ### Create the Event Data
 
 Event data have dates and times when trap plants were deployed, retrieved and assessed for each event.
+These data will be downloaded from the Zenodo archive as well.
+
+1. Download using `read_csv()`.
+2. Change "assessment date" to a date class.
+3. Create a new column called "exposed" using the `interval()` function from `lubridate`.
+4. Inspect the final data frame.
 
 
 ~~~
 events <-
-   read_csv(
-      system.file(
-         "extdata",
-         "Dispersal_experiment_dates.csv",
-         package = "ChickpeaAscoDispersal",
-         mustWork = TRUE
-      )
-   ) %>%
+   read_csv("https://zenodo.org/record/3842293/files/Dispersal_experiment_dates.csv?download=1") %>%
    mutate(`assessment date` = dmy(`assessment date`)) %>%
    mutate(exposed = interval(`time out`, `time removed`))
 
@@ -582,6 +779,10 @@ Filter the data removing any dates that do not have "event" data necessary for a
 Because events overlap at Horsham, the dryland and irrigated sites are handled separately first, then combined.
 To do this, first `filter()`, then use `case_when()` to match the dates and times with the `events` data frame and create new variables to indicate which replicate and location, which is used to determine an event in the data.
 
+Here we use a special function, `%within%` from `lubridate` to check, "Does a date (or interval) fall within an interval?"
+
+Using `%within%` we will filter the weather data, keeping only the times and dates when the trap plants were exposed for each event and location.
+
 #### Horsham Irrigated
 
 
@@ -621,7 +822,7 @@ Horsham_rain <-
    mutate(Location = case_when(Time %within% events[4, "exposed"] ~ events[[4, "site"]],
                                Time %within% events[5, "exposed"] ~ events[[5, "site"]])) %>%
    mutate(Rep = case_when(Time %within% events[4, "exposed"] ~ events[[4, "rep"]],
-                          Time %within% events[5, "exposed"] ~ events[[5, "rep"]], )) %>%
+                          Time %within% events[5, "exposed"] ~ events[[5, "rep"]],)) %>%
    rename(site = Location, rep = Rep, time = Time) %>%
    select(site, rep, time, everything())
 ~~~
@@ -640,10 +841,31 @@ Curyo_rain <-
                              events[[which(events$site == "Curyo"), "rep"]])) %>%
    rename(site = Location, rep = Rep, time = Time) %>%
    select(site, rep, time, everything())
+~~~
+{: .language-r}
 
+
+
+~~~
+Error: Problem with `filter()` input `..1`.
+✖ No %within% method with signature a = character,  b = tbl_df
+ℹ Input `..1` is `Time %within% events[which(events$site == "Curyo"), "exposed"]`.
+~~~
+{: .error}
+
+
+
+~~~
 weather <- bind_rows(Curyo_rain, Horsham_irrg, Horsham_rain)
 ~~~
 {: .language-r}
+
+
+
+~~~
+Error in list2(...): object 'Curyo_rain' not found
+~~~
+{: .error}
 
 ### Rename Columns and Add Other Calculations
 
@@ -663,7 +885,19 @@ cleaned_weather <-
    select(site, rep, time, everything()) %>%
    arrange(site, rep, time) %>% 
    mutate_at(vars(site, rep), factor)
+~~~
+{: .language-r}
 
+
+
+~~~
+Error in eval(lhs, parent, parent): object 'weather' not found
+~~~
+{: .error}
+
+
+
+~~~
 glimpse(cleaned_weather)
 ~~~
 {: .language-r}
@@ -810,15 +1044,3 @@ kable(summary_weather,
   </tr>
 </tbody>
 </table>
-
-## Save Weather Data
-
-Save weather data for use in visualisation and modelling.
-This only needs to be done once.
-
-
-~~~
-save(cleaned_weather, file = "./data/cleaned_weather.rda")
-save(summary_weather, file = "./data/summary_weather.rda")
-~~~
-{: .language-r}

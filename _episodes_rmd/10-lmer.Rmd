@@ -1,21 +1,21 @@
 ---
 title: "Check if Location Affects Conidial Dispersal"
-teaching: 60
-exercises: 15
+teaching: 15
+exercises: 0
 questions:
 - "Did experimental location (site) affect conidial dispersal?"
-- "?"
-- "?"
 objectives:
-- ""
+- "Determine if the location of the experiment had an effect on conidial dispersal or if the data can be pooled from all sites."
 keypoints:
-- ""
+- "Check the effects of location when modelling. Sometimes the site can have a significant effect and should be accounted for."
+- "ANOVA can be used to compare models."
+- "Use AIC to help determine the best model fit for the data."
 source: Rmd
 ---
 
 ```{r chunk_options, include=FALSE}
 source("../bin/chunk-options.R")
-knitr_fig_path("12-")
+knitr_fig_path("10-")
 ```
 
 ```{r setup, include=FALSE}
@@ -100,7 +100,8 @@ formula(mod2)
 anova(mod1, mod2)
 ```
 
-A comparison of the two models shows us that `mod2` is much better fit given the lower AIC and that there is no significant difference in the models. Following a reductive approach we should remove site from the model.
+A comparison of the two models shows us that `mod2` is much better fit given the lower AIC and that there is no significant difference in the models.
+Following a reductive approach we should remove site from the model.
 
 ```{r mod2}
 summary(mod2)

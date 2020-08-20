@@ -20,7 +20,7 @@ source: Rmd
 
 ```{r chunk_options, include=FALSE}
 source("../bin/chunk-options.R")
-knitr_fig_path("09-")
+knitr_fig_path("07-")
 ```
 
 To get started with the Ascochyta blight (AB) modelling, we need to import the lesion count data and calculate mean lesion values for each respective station along the ten transects.

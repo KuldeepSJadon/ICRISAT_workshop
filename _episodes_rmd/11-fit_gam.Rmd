@@ -1,0 +1,500 @@
+---
+title: "Fit and Compare Generalised Additive Models of Conidial Dispersal"
+teaching: 45
+exercises: 15
+questions:
+- "How can we use a generalised additive model (GAM) to represent conidial dispersal?"
+- "What can the GAM tell us about the data?"
+objectives:
+- "Join different sets of data together for building a model."
+- "Fit generalised additive models to data."
+- "Determine which factors are necessary to include in the model."
+- "Evaluate different models to determine which model provides the best fit."
+- "Visualise a generalised additive model."
+keypoints:
+- "Generalised additive models are a powerful way to model non-linear relationships."
+- "When fitting models to data, check many ways and compare."
+- "There are no perfect models, only some that are better than others."
+source: Rmd
+---
+
+```{r chunk_options, include=FALSE}
+source("../bin/chunk-options.R")
+knitr_fig_path("11-")
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(fig.width = 9.4, fig.height = 9.4)
+```
+
+In this episode we will explore how to fit and evaluate the best fitting model for our data.
+I've chosen to use a generalised additive model for this work because as we saw in the data visualisation episode, the lesion count data is not linear, *i.e.* the lesion counts follow a curve not a straight line as you get farther from the source of inoculum.
+
+### Load Libraries for This Exercise
+
+Loading the `ChickpeaAscoDispersal` library will load the data we previously generated.
+
+```{r libraries, message=FALSE, echo=FALSE}
+library("ChickpeaAscoDispersal")
+library("tidyverse")
+library("broom") # provides a way to "tidy" model outputs
+library("mgcv") # provides GAM fits
+library("mgcViz") # use ggplot2 to visulalise GAMs
+
+theme_set(theme_bw(base_size = 14))
+```
+
+## Create Data Set for GAMs
+
+Use `dplyr::left_join()` join the `lesion_counts` data and the `summary_weather` data to create `dat` for creating GAMs.
+`left_join()` is a powerful tool for combining data sets based on one or more matching columns.
+
+```{r import_data, message=FALSE}
+dat <-
+   left_join(lesion_counts, summary_weather, by = c("site", "rep"))
+```
+
+```{r fonts, include=FALSE, message=FALSE, eval=FALSE}
+# run only if knitting on new computer/new R installation
+# !!!! Run this in a regular interactive console not this markdown file !!!!
+# this is necessary to embed fonts in .eps files for EJPP
+# run only if knitting on new computer
+# this is necessary to embed fonts in .eps files for EJPP
+library("extrafont")
+
+if (.Platform$OS.type == "windows") {
+   font_import(pattern = "arial", prompt = FALSE)
+   loadfonts(device = "postscript", quiet = TRUE)
+} else {
+   font_import(pattern = "Arial", prompt = FALSE)
+   loadfonts(device = "postscript", quiet = TRUE)
+}
+```
+
+## Fit GAMs
+
+For reproducibility purposes, use `set.seed()`.
+
+```{r set-seed, echo=TRUE}
+set.seed(27)
+```
+
+### mod1 - s(Distance)
+
+```{r fit-mod1}
+mod1 <-
+   gam(m_lesions ~ s(distance, k = 5),
+       data = dat)
+
+summary(mod1)
+
+print(p_gam(x = getViz(mod1)) +
+         ggtitle("s(Distance)"),
+      pages = 1)
+
+mod1_vis <- getViz(mod1)
+check(
+   mod1_vis,
+   a.qq = list(method = "tnorm",
+               a.cipoly = list(fill = "light blue")),
+   a.respoi = list(size = 0.5),
+   a.hist = list(bins = 10)
+)
+```
+
+### mod2 - s(Distance) + Precipitation
+
+```{r fit-mod2}
+mod2 <-
+   gam(m_lesions ~ sum_rain + s(distance, k = 5),
+       data = dat)
+
+summary(mod2)
+
+print(p_gam(x = getViz(mod2)) +
+         ggtitle("s(Distance) + Precipitation"),
+      pages = 1)
+
+mod2_vis <- getViz(mod2)
+check(
+   mod2_vis,
+   a.qq = list(method = "tnorm",
+               a.cipoly = list(fill = "light blue")),
+   a.respoi = list(size = 0.5),
+   a.hist = list(bins = 10)
+)
+```
+
+### mod3 - s(Distance) + Wind speed
+
+```{r fit-mod3}
+mod3 <-
+   gam(m_lesions ~ mws + s(distance, k = 5),
+       data = dat)
+
+summary(mod3)
+
+print(p_gam(x = getViz(mod3)) +
+         ggtitle("s(Distance) + Wind speed"),
+      pages = 1)
+
+mod3_vis <- getViz(mod3)
+check(
+   mod3_vis,
+   a.qq = list(method = "tnorm",
+               a.cipoly = list(fill = "light blue")),
+   a.respoi = list(size = 0.5),
+   a.hist = list(bins = 10)
+)
+```
+
+### mod4 - s(Distance) + Wind speed + Precipitation
+```{r fit-mod4}
+mod4 <-
+   gam(m_lesions ~ sum_rain + mws + s(distance, k = 5),
+       data = dat)
+
+summary(mod4)
+
+print(p_gam(x = getViz(mod4)) +
+         ggtitle("s(Distance) + Wind speed + Precipitation"),
+      pages = 1)
+
+mod4_vis <- getViz(mod4)
+check(
+   mod4_vis,
+   a.qq = list(method = "tnorm",
+               a.cipoly = list(fill = "light blue")),
+   a.respoi = list(size = 0.5),
+   a.hist = list(bins = 10)
+)
+```
+
+### mod5 - s(Distance + Wind Speed) + Precipitation
+
+```{r fit-mod5}
+mod5 <-
+   gam(m_lesions ~ sum_rain + s(distance + mws, k = 5),
+       data = dat)
+
+summary(mod5)
+
+
+print(p_gam(x = getViz(mod5)) +
+         ggtitle("s(Distance + Wind Speed) + Precipitation"),
+      pages = 1)
+
+mod5_vis <- getViz(mod5)
+check(
+   mod5_vis,
+   a.qq = list(method = "tnorm",
+               a.cipoly = list(fill = "light blue")),
+   a.respoi = list(size = 0.5),
+   a.hist = list(bins = 10)
+)
+```
+
+### mod6 - s(Distance) + s(Wind Speed) + Precipitation
+
+```{r fit-mod6}
+mod6 <-
+   gam(m_lesions ~ sum_rain + s(distance, k = 5) + s(mws, k = 5),
+       data = dat)
+
+summary(mod6)
+
+
+print(p_gam(x = getViz(mod6)) +
+         ggtitle("s(Distance) + s(Wind Speed) + Precipitation"),
+      pages = 1)
+
+mod6_vis <- getViz(mod6)
+check(
+   mod6_vis,
+   a.qq = list(method = "tnorm",
+               a.cipoly = list(fill = "light blue")),
+   a.respoi = list(size = 0.5),
+   a.hist = list(bins = 10)
+)
+```
+
+### mod7 - s(Distance) + s(Wind Speed)
+
+```{r fit-mod7}
+mod7 <-
+   gam(m_lesions ~ s(distance, k = 5) + s(mws, k = 5),
+       data = dat)
+
+summary(mod7)
+
+print(p_gam(x = getViz(mod7)) +
+         ggtitle("s(Distance) + s(Wind Speed)"),
+      pages = 1)
+
+mod7_vis <- getViz(mod7)
+check(
+   mod7_vis,
+   a.qq = list(method = "tnorm",
+               a.cipoly = list(fill = "light blue")),
+   a.respoi = list(size = 0.5),
+   a.hist = list(bins = 10)
+)
+```
+
+### mod8 - s(Distance) + s(Wind Speed) + s(Precipitation)
+
+```{r fit-mod8}
+mod8 <-
+   gam(m_lesions ~ s(distance, k = 5) + s(mws, k = 5) + s(sum_rain, k = 5),
+       data = dat)
+
+summary(mod8)
+
+print(p_gam(x = getViz(mod8)) +
+         ggtitle("s(Distance) + s(Wind Speed) + s(Precipitation)"),
+      pages = 1)
+
+mod8_vis <- getViz(mod8)
+check(
+   mod8_vis,
+   a.qq = list(method = "tnorm",
+               a.cipoly = list(fill = "light blue")),
+   a.respoi = list(size = 0.5),
+   a.hist = list(bins = 10)
+)
+```
+
+### mod9 - s(Distance) + s(Precipitation)
+
+```{r fit-mod9}
+mod9 <-
+   gam(m_lesions ~ s(distance, k = 5) + s(sum_rain, k = 5),
+       data = dat)
+
+summary(mod9)
+
+print(p_gam(x = getViz(mod9)) +
+         ggtitle("s(Distance) + s(Precipitation)"),
+      pages = 1)
+
+mod9_vis <- getViz(mod9)
+check(
+   mod9_vis,
+   a.qq = list(method = "tnorm",
+               a.cipoly = list(fill = "light blue")),
+   a.respoi = list(size = 0.5),
+   a.hist = list(bins = 10)
+)
+```
+
+### mod10 - s(Distance) +s(Precipitation) + Wind speed
+
+```{r fit-mod10}
+mod10 <-
+   gam(m_lesions ~ s(distance, k = 5) + s(sum_rain, k = 5) + mws,
+       data = dat)
+
+summary(mod10)
+
+print(p_gam(x = getViz(mod10)) +
+         ggtitle("s(Distance) + s(Precipitation) + Wind speed"),
+      pages = 1)
+
+mod10_vis <- getViz(mod10)
+check(
+   mod10_vis,
+   a.qq = list(method = "tnorm",
+               a.cipoly = list(fill = "light blue")),
+   a.respoi = list(size = 0.5),
+   a.hist = list(bins = 10)
+)
+```
+
+### mod11 - s(Distance) + s(Wind Speed) + s(Precipitation), family = tw()
+
+This is the same as `mod8` but using `family = tw()`, see `?family.mgcv` for more on the families.
+The Tweedie distribution is used where the distribution has a positive mass at zero, but is continuous unlike the Poisson distribution that requires count data.
+The data visualisation shows clearly that the mean pot count data have this shape.
+
+```{r fit-mod11}
+mod11 <-
+   gam(
+      m_lesions ~ s(distance, k = 5) +
+         s(mws, k = 5) +
+         s(sum_rain, k = 5),
+      data = dat,
+      family = tw()
+   )
+
+summary(mod11)
+
+print(
+   p_gam(x = getViz(mod11)) +
+      ggtitle("s(Distance) + s(Wind Speed) + s(Precipitation), family = tw()"),
+   pages = 1
+)
+
+mod11_vis <- getViz(mod11)
+check(
+   mod11_vis,
+   a.qq = list(method = "tnorm",
+               a.cipoly = list(fill = "light blue")),
+   a.respoi = list(size = 0.5),
+   a.hist = list(bins = 10)
+)
+```
+
+### mod12 - s(Distance, bs = "ts") + s(Precipitation, bs = "ts") Wind speed, family = tw()
+
+Try using wind speed as a linear predictor only.
+
+```{r fit-mod12}
+mod12 <-
+   gam(
+      m_lesions ~ s(distance, k = 5, bs = "ts") +
+         s(mws, k = 5, bs = "ts") +
+         s(sum_rain, k = 5, bs = "ts"),
+      data = dat,
+      family = tw()
+   )
+
+summary(mod12)
+
+print(
+   p_gam(x = getViz(mod12)) +
+      ggtitle(
+         "s(Distance, bs = 'ts') + s(Wind speed, bs = 'ts')\n+ s(Precipitation, bs = 'ts'), family = tw()"
+      ),
+   pages = 1
+)
+
+mod12_vis <- getViz(mod12)
+check(
+   mod12_vis,
+   a.qq = list(method = "tnorm",
+               a.cipoly = list(fill = "light blue")),
+   a.respoi = list(size = 0.5),
+   a.hist = list(bins = 10)
+)
+```
+
+### mod13 - s(Distance, bs = "ts") + s(Wind speed, bs = "ts") + s(Precipitation, bs = "ts"), family = tw()
+
+```{r fit-mod13}
+mod13 <-
+   gam(
+      m_lesions ~ s(distance, k = 5, bs = "ts") +
+         s(mws, k = 5, bs = "ts") +
+         s(sum_rain, k = 5, bs = "ts"),
+      data = dat,
+      family = tw()
+   )
+
+summary(mod13)
+
+print(
+   p_gam(x = getViz(mod13)) +
+      ggtitle(
+         "s(Distance, bs = 'ts') + s(Wind speed, bs = 'ts')\n+ s(Precipitation, bs = 'ts'), family = tw()"
+      ),
+   pages = 1
+)
+
+mod13_vis <- getViz(mod13)
+check(
+   mod13_vis,
+   a.qq = list(method = "tnorm",
+               a.cipoly = list(fill = "light blue")),
+   a.respoi = list(size = 0.5),
+   a.hist = list(bins = 10)
+)
+```
+
+This model, same structure as `mod11`, uses thin-plate splines to shrink the coefficients of the smooth to zero when possible.
+
+## Compare the Models
+
+### AIC, BIC
+```{r compare-mods}
+models <- list(
+   mod1 = mod1,
+   mod2 = mod2,
+   mod3 = mod3,
+   mod4 = mod4,
+   mod5 = mod5,
+   mod6 = mod6,
+   mod7 = mod7,
+   mod8 = mod8,
+   mod9 = mod9,
+   mod10 = mod10,
+   mod11 = mod11,
+   mod12 = mod12,
+   mod13 = mod13
+)
+map_df(models, glance, .id = "model") %>%
+   arrange(AIC)
+```
+
+### R^2^
+```{r r2}
+enframe(
+   c(
+      mod1 = summary(mod1)$r.sq,
+      mod2 = summary(mod2)$r.sq,
+      mod3 = summary(mod3)$r.sq,
+      mod4 = summary(mod4)$r.sq,
+      mod5 = summary(mod5)$r.sq,
+      mod6 = summary(mod6)$r.sq,
+      mod7 = summary(mod7)$r.sq,
+      mod8 = summary(mod8)$r.sq,
+      mod9 = summary(mod9)$r.sq,
+      mod10 = summary(mod10)$r.sq,
+      mod11 = summary(mod11)$r.sq,
+      mod12 = summary(mod12)$r.sq,
+      mod13 = summary(mod13)$r.sq
+   )
+) %>%
+   arrange(desc(value))
+```
+
+### ANOVA
+```{r anova}
+anova(mod1,
+      mod2,
+      mod3,
+      mod4,
+      mod5,
+      mod6,
+      mod7,
+      mod8,
+      mod9,
+      mod10,
+      mod11,
+      mod12,
+      mod13,
+      test = "F")
+```
+
+> ## Challenge 1
+>
+> Discuss with your neighbours which model is the best fit and why.
+>
+> What are the criteria that you've used to determine this?
+>
+> What can you say about the model?
+> 
+> What can you NOT say about the model?
+>
+> > ## Solution to Challenge 1
+> >This model, _mod11_,
+> > `m_lesions ~ s(Distance) + s(WindSpeed) + s(Precipitation) - family = tw()`,
+> >is the best performing model.
+> >
+> >*It cannot be used for predictions*, but it suitably describes the dispersal
+> >data we have on hand with the parameters used.
+> >
+> >More data would be desirable to increase the value of `k` as evidenced in the
+> >GAM checks.
+> >
+> {: .solution}
+{: .challenge}

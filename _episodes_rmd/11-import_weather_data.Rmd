@@ -1,9 +1,9 @@
 ---
 title: "Importing Weather Data for Use in Modelling Spore Dispersal"
-teaching: 15
+teaching: 20
 exercises: 10
 questions:
-- "How can I prepare my weather data from diferent stations and merge it?"
+- "How can I prepare my weather data from different stations and merge it?"
 - "How can I prepare my weather data for use in an analysis?"
 - "How can I save my weather data it without overwriting the raw data?"
 objectives:
@@ -24,7 +24,7 @@ source: Rmd
 
 ```{r chunk_options, include=FALSE}
 source("../bin/chunk-options.R")
-knitr_fig_path("08-")
+knitr_fig_path("11-")
 ```
 
 ### Load Libraries for This Exercise
@@ -58,9 +58,9 @@ I have checked the irrigation schedules and I irrigated for 90 minutes each time
 > The team have run the test once yesterday morning and once this morning.
 It is difficult, as the wind has not been dropping down to 0-5kph and there is no wind breaks out there. Based on the forecast this will be the best we can get for at least the length of the forecast ahead.
 
-> First test showed 0.12mm per min, with 08-15kph wind
+> First test showed 0.12mm per min, with 10-15kph wind
 
-> Second test showed 0.13mm per min with 08-20kph wind
+> Second test showed 0.13mm per min with 10-20kph wind
 
 > Even with the variability I am confident in these figures as the wind is mainly changing where is being irrigated rather than the amount based on the testing.
 Less irrigation into the wind. We have a Northerly wind currently where as it was westerly when we irrigated so wind would have been blowing with the length of the sprinkler system so to speak.
@@ -87,6 +87,8 @@ head(Curyo_w)
 Select only the columns we need, convert dates to a date class, add the location, "Curyo" and make it the first column in the data frame.
 
 ```{r}
+Curyo_w <-
+   Curyo_w %>%
    select(Time,
           'Wind Speed - average (km/h)',
           'Wind Direction - average (º)',

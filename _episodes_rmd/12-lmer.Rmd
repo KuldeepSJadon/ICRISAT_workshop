@@ -1,6 +1,6 @@
 ---
 title: "Check if Location Affects Conidial Dispersal"
-teaching: 15
+teaching: 30
 exercises: 0
 questions:
 - "Did experimental location (site) affect conidial dispersal?"
@@ -15,7 +15,7 @@ source: Rmd
 
 ```{r chunk_options, include=FALSE}
 source("../bin/chunk-options.R")
-knitr_fig_path("10-")
+knitr_fig_path("12-")
 ```
 
 ```{r setup, include=FALSE}

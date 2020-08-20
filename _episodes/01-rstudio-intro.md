@@ -245,7 +245,7 @@ Really small or large numbers get a scientific notation:
 
 
 ~~~
-[1] 2e-04
+[1] 0.0002
 ~~~
 {: .output}
 
@@ -283,7 +283,7 @@ sin(1)  # trigonometry functions
 
 
 ~~~
-[1] 0.841471
+[1] 0.8415
 ~~~
 {: .output}
 
@@ -322,7 +322,7 @@ exp(0.5) # e^(1/2)
 
 
 ~~~
-[1] 1.648721
+[1] 1.649
 ~~~
 {: .output}
 
@@ -486,7 +486,7 @@ log(x)
 
 
 ~~~
-[1] -3.688879
+[1] -3.689
 ~~~
 {: .output}
 
@@ -709,7 +709,7 @@ function (name, pos = -1L, envir = as.environment(pos), all.names = FALSE,
     }
     else all.names
 }
-<bytecode: 0x7fcc5054f0f8>
+<bytecode: 0x7fe08fbc6e08>
 <environment: namespace:base>
 ~~~
 {: .output}

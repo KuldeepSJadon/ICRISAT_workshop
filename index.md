@@ -24,7 +24,8 @@ R is commonly used in many scientific disciplines for statistical analysis and i
 packages.
 We find that many scientists who come to Software Carpentry workshops use R and want to learn more. The emphasis of these materials is to give attendees a strong foundation in the fundamentals of R, and to teach best practices for scientific computing: breaking down analyses into modular units, task automation, and encapsulation.
 
-Note that this workshop will focus on teaching the fundamentals of the programming language R, and will not teach statistical analysis.
+Note that this workshop will focus on teaching the fundamentals of the programming language R in day one.
+Day 2 will have some exercises with fitting and evaluating models followed by working with spatial data and interpreting model output.
 
 A variety of third party packages are used throughout this workshop.
 These are not necessarily the best, nor are they comprehensive, but they are packages we find useful, and have been chosen primarily for their usability.

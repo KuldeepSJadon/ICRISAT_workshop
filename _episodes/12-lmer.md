@@ -101,7 +101,7 @@ formula(mod1)
 
 ~~~
 m_lesions ~ distance + (distance | site/SpEv)
-<environment: 0x7faf3c6811a0>
+<environment: 0x7fb2072a79a0>
 ~~~
 {: .output}
 
@@ -190,7 +190,7 @@ formula(mod2)
 
 ~~~
 m_lesions ~ distance + (distance | SpEv)
-<environment: 0x7faf3c6811a0>
+<environment: 0x7fb2072a79a0>
 ~~~
 {: .output}
 

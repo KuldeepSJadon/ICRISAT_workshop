@@ -78,7 +78,7 @@ Ihsanul Khaliq, Joshua Fanning, Paul Melloy, Jean Galloway, Kevin Moore, Daniel 
 > >~~~
 > >
 > >The downloaded binary packages are in
-> >	/var/folders/yv/4xy6zs3x5qsgj96389nkjvtw0000gn/T//RtmpKxreLm/downloaded_packages
+> >	/var/folders/yv/4xy6zs3x5qsgj96389nkjvtw0000gn/T//RtmppJljn3/downloaded_packages
 > >~~~
 > >{: .output}
 > {: .solution}

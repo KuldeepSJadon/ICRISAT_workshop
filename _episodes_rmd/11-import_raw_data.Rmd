@@ -1,0 +1,137 @@
+---
+title: "Importing Raw Ascochyta Blight Lesion Count Data"
+teaching: 20
+exercises: 0
+questions:
+- "How can I prepare my data for analysis and save it without overwriting the raw data?"
+objectives:
+- " Understand how to import real-world data"
+- " Calculate mean values from raw data"
+- " Data frame manipulation including dropping and converting columns"
+- " Save the newly formatted data for use in further work using R"
+keypoints:
+- "Use `readr` to import CSV files in place of `read.csv()`"
+- "Use `dplyr` to add new columns of data."
+- "Use `dplyr` to summarise data."
+- "Create a data set that is useful for visualisation and modelling."
+- "Using RMarkdown can help you ensure reproducible research that can be reshared and reused."
+source: Rmd
+---
+
+```{r chunk_options, include=FALSE}
+source("../bin/chunk-options.R")
+knitr_fig_path("11-")
+```
+
+To get started with the Ascochyta blight (AB) modelling, we need to import the lesion count data and calculate mean lesion values for each respective station along the ten transects.
+
+In the first step, the data is imported directly from the Zenodo archive.
+
+## Load libraries
+
+We will use the `tidyverse` to import and format these data for use in our model.
+
+```{r libraries}
+library("tidyverse")
+```
+
+## Import and Inspect Lesion Data
+
+Using `read_csv()` import the lesion count data from Zenodo where they are archived.
+See [10.5281/zenodo.3842293](https://doi.org/10.5281/zenodo.3842293) for a full description of the data.
+The data have already been well formatted for importing into R but we still need to make some changes.
+
+```{r import_data, message=FALSE}
+lesion_counts <-
+   read_csv("https://zenodo.org/record/3842293/files/lesion_counts.csv?download=1")
+head(lesion_counts)
+```
+
+In the next step, the "m" from the `distance` column is dropped and the column is converted to numeric.
+A new column, `SpEv` (Spread Event), is created for each location and replicated event at that location. Another new column, `degrees`, is added for each transect to indicate the direction in degrees based on J. Fanning's best information.
+Lastly the mean lesions counted per plant within the pot, `m_lesions` is calculated for each of the transects at each distance, 0, 10, 25, 50 and 75 meters from the plots.
+
+After the data are updated, a column for precipitation type, `ptype`, is added and the spread events, `SpEv`, are renamed for clarity and ordered as factors for data visualisation.
+
+There's a lot going on here, so we'll go through it slowly and line by line.
+
+
+```{r}
+lesion_counts <-
+   lesion_counts %>%
+   mutate(site = str_remove(site, " SPA")) %>%
+   mutate(distance = as.numeric(str_replace(distance, " m", ""))) %>%
+   unite(SpEv, c(site, rep), remove = FALSE) %>%
+   mutate(
+      degrees = case_when(
+         site == "Curyo" & transect == 1 ~ 290,
+         site == "Curyo" & transect == 2 ~ 300,
+         site == "Curyo" & transect == 3 ~ 310,
+         site == "Curyo" & transect == 4 ~ 320,
+         site == "Curyo" & transect == 5 ~ 330,
+         site == "Curyo" & transect == 6 ~ 340,
+         site == "Curyo" & transect == 7 ~ 350,
+         site == "Curyo" & transect == 8 ~ 360,
+         site == "Curyo" & transect == 9 ~ 10,
+         site == "Curyo" & transect == 10 ~ 20,
+         site == "Horsham" & transect == 1 ~ 45,
+         site == "Horsham" & transect == 2 ~ 55,
+         site == "Horsham" & transect == 3 ~ 65,
+         site == "Horsham" & transect == 4 ~ 75,
+         site == "Horsham" & transect == 5 ~ 85,
+         site == "Horsham" & transect == 6 ~ 95,
+         site == "Horsham" & transect == 7 ~ 105,
+         site == "Horsham" & transect == 8 ~ 115,
+         site == "Horsham" & transect == 9 ~ 125,
+         site == "Horsham" & transect == 10 ~ 135,
+         site == "pbc" & transect == 1 ~ 45,
+         site == "pbc" & transect == 2 ~ 55,
+         site == "pbc" & transect == 3 ~ 65,
+         site == "pbc" & transect == 4 ~ 75,
+         site == "pbc" & transect == 5 ~ 85,
+         site == "pbc" & transect == 6 ~ 95,
+         site == "pbc" & transect == 7 ~ 105,
+         site == "pbc" & transect == 8 ~ 115,
+         site == "pbc" & transect == 9 ~ 125,
+         site == "pbc" & transect == 10 ~ 135
+      )
+   ) %>%
+   mutate(
+      ptype = case_when(
+         SpEv == "pbc_1" ~ "irrigation",
+         SpEv == "pbc_2" ~ "irrigation",
+         SpEv == "pbc_3" ~ "mixed",
+         SpEv == "Horsham_1" ~ "rainfall",
+         SpEv == "Horsham_2" ~ "rainfall",
+         SpEv == "Curyo_1" ~ "rainfall"
+      )
+   ) %>%
+   mutate(
+      site = case_when(
+         site == "pbc" ~ "Horsham irrigated",
+         site == "Horsham" ~ "Horsham dryland",
+         site == "Curyo" ~ "Curyo"
+      )
+   ) %>%
+   mutate(
+      SpEv = case_when(
+         SpEv == "pbc_1" ~ "Horsham Irrg 1",
+         SpEv == "pbc_2" ~ "Horsham Irrg 2",
+         SpEv == "pbc_3" ~ "Horsham Mixd 1",
+         SpEv == "Horsham_1" ~ "Horsham Rain 1",
+         SpEv == "Horsham_2" ~ "Horsham Rain 2",
+         SpEv == "Curyo_1" ~ "Curyo Rain 1"
+      )
+   ) %>%
+   mutate_at(vars(SpEv, site, rep), factor) %>%
+   mutate(m_lesions = rowMeans(select(., counts_p1:counts_p5),
+                               na.rm = TRUE)) %>%
+   select(-dist_stat) %>%
+   arrange(SpEv, transect, distance)
+```
+
+Use `glimpse()` from `dplyr` to inspect the data.
+
+```{r glimpse}
+glimpse(lesion_counts)
+```

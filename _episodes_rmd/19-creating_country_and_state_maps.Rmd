@@ -1,0 +1,179 @@
+---
+title: "Creating Country and State Level Maps"
+teaching: 15
+exercises: 10
+questions:
+- "How can I get outlines of countries or states in R?"
+- "How do I highlight a specific state?"
+objectives:
+- "Understand how to retreive data for making maps."
+- "Understand how to manipulate and subset data to create maps."
+keypoints:
+- "R has packages that make it easy to retrieve data and create maps."
+- "The sf package works nicely with ggplot2 and tidyverse."
+source: Rmd
+---
+
+
+```{r chunk_options, include=FALSE}
+source("../bin/chunk-options.R")
+knitr_fig_path("19-")
+```
+
+In this first exercise we will use [_rnaturalearth_](https://github.com/ropenscilabs/rnaturalearth), [_simple features_](https://cran.r-project.org/web/packages/sf/vignettes/sf1.html) and
+_ggplot2_ to create a map of India and states within India to use as the base of the maps we will create in these exercises.
+
+## Create Country Level Map of India
+
+This is our base layer, India, of the map from [Naturalearth.com](https://naturalearth.com/) using the base `plot()` to display these data.
+
+Using `ne_states()` will return an `sf` object with state level information. There is also a `ne_countries()` to download country level outlines only as well.
+
+```{r India-base}
+library("rnaturalearth")
+
+in_sf <- ne_states(geounit = "india",
+                   returnclass = "sf")
+
+plot(in_sf)
+```
+
+### Plot using `ggplot2`
+
+Using _ggplot2_, we have more control over how the data are displayed.
+
+First plot the whole country using `ggplot()`.
+
+```{r plot_level1, eval=TRUE}
+library("ggplot2")
+
+india <- ggplot(in_sf) +
+  geom_sf(fill = "white")
+
+india
+```
+
+### Add Labels to the States
+
+The naturalearth data have several columns to work with. One of them is the abbreviation for the states. Using `geom_text()`, we can add this information to the map. 
+
+```{r plot_level2}
+india <-
+  india +
+  geom_text(
+    data = in_sf,
+    aes(x = longitude,
+        y = latitude,
+        label = postal),
+    size = 2.5,
+    hjust = 1
+  )
+
+india
+```
+
+### Final Touches
+
+Properly label the x and y-axis and set the theme. The _ggplot2_ theme, `theme_bw()` is nice to use with maps so we will apply that here as well.
+
+```{r plot_level3}
+india <- 
+  india +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  theme_bw()
+
+india
+```
+
+## Create Maps of Individual States
+
+To create a map of only Andhra Pradesh, subset the _sf_ object, `india` such that it contains only the data for Andhra Pradesh.
+
+### Inspect Column Names in `in_sf` Object
+
+To find out what the column names are, we can use, `colnames()`.
+
+```{r colnames}
+names(in_sf)
+```
+
+We see that a column named "name" exists, with the name of each state.
+
+We can use this to `filter()` the data so that it only represents Andhra Pradesh and we can use that to make a map.
+
+For more on subsetting _sf_ objects, see: <https://cran.rstudio.com/web/packages/sf/vignettes/sf4.html>
+
+### Filter Andhra Pradesh
+
+```{r subset-ap}
+library("dplyr")
+
+ap <- filter(in_sf, name == "Andhra Pradesh")
+
+ap
+```
+
+### Plot Andhra Pradesh
+
+```{r ggplot-ap}
+ggplot(data = ap) +
+  geom_sf() +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  theme_bw()
+```
+
+## Highlighting States Within the Country
+
+Using the `in_sf` and `ap` objects that we have created, it is possible to create a map that highlights one state and labels it using the abbreviation, in this case Andhra Pradesh.
+
+```{r hightlight-ap}
+ggplot(data = in_sf) +
+  geom_sf(fill = "white") +
+  geom_sf(
+    data = ap,
+    fill = "red") +
+  geom_text(
+    data = ap,
+    aes(x = longitude,
+        y = latitude,
+        label = postal),
+    size = 2.5,
+    hjust = 1) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  theme_bw()
+```
+
+
+> ## Challenge 1
+>
+> Create a map of India that highlights another state of your choice and label
+> only that state.
+> Make the state a different colour other than red.
+>
+> > ## Solution to Challenge 1
+> >```{r}
+> > tn <- filter(in_sf, name == "Tamil Nadu")
+> > 
+> > ggplot(data = in_sf) +
+> >  geom_sf(fill = "white") +
+> >  geom_sf(
+> >    data = tn,
+> >    fill = "yellow") +
+> >  geom_text(
+> >    data = tn,
+> >    aes(x = longitude,
+> >        y = latitude,
+> >        label = postal),
+> >    size = 2.5,
+> >    hjust = 1) +
+> >  xlab("Longitude") +
+> >  ylab("Latitude") +
+> >  theme_bw()
+> > ```
+> {: .solution}
+>
+{: .challenge}
+

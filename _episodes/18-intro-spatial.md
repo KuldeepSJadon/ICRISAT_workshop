@@ -30,15 +30,18 @@ Understanding how these data differ is important to being able to use them in ma
 
 Spatial data has its own unique properties. Packages that are commonly used with spatial data in R include.
 
-* [_raster_](https://CRAN.R-project.org/package=raster) [@raster], 
-* [_sf_](https://CRAN.R-project.org/package=raster) [@sf], 
-* [_rnaturalearth_](https://CRAN.R-project.org/package=rnaturalearth) [@rnaturalearth],
+* [_raster_](https://CRAN.R-project.org/package=raster),
+* [_terra_](https://CRAN.R-project.org/package=terra),
+* [_sf_](https://CRAN.R-project.org/package=raster),
+* [_rnaturalearth_](https://CRAN.R-project.org/package=rnaturalearth),
 * [_rnaturalearthdata_](https://CRAN.R-project.org/package=rnaturalearthdata),
-* [_ggspatial_](https://CRAN.R-project.org/package=ggspatial) [@ggspatial],
+* [_ggspatial_](https://CRAN.R-project.org/package=ggspatial),
 * _grid_ (this is a part of your base R installation) and
 * [_gridExtra_](https://CRAN.R-project.org/package=gridExtra).
 
 The _raster_ package is used to handle raster data files but also offers capabilities to download and import other data including country-level outlines ([GADM](https://gadm.org/)), elevation (SRTM data) and bioclimatic variables from [Worldclim](https://www.worldclim.org/).
+
+The _terra_ package is a replacement for the _raster_ package developed by the same person to be faster and more simple.
 
 _sf_ is used to handle vector-format files and _ggplot2_ now offers `geom_sf()` for easy plotting of _sf_ objects.
 
@@ -82,7 +85,7 @@ You may also want to visit [https://rspatial.org](https://rspatial.org/) for mor
 > >~~~
 > >
 > >The downloaded binary packages are in
-> >	/var/folders/yv/4xy6zs3x5qsgj96389nkjvtw0000gn/T//Rtmpj9YbpT/downloaded_packages
+> >	/var/folders/yv/4xy6zs3x5qsgj96389nkjvtw0000gn/T//RtmpKenYKA/downloaded_packages
 > >~~~
 > >{: .output}
 > {: .solution}

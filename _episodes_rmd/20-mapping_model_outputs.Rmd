@@ -108,7 +108,7 @@ in_lb +
 >
 > How would you interpret this map for someone unfamiliar with rice leaf blast?
 > What can you say about where it seems to occur most frequently?
-> Does this map match your expecations of the areas where the disease is the worst?
+> Does this map match your expectations of the areas where the disease is the worst?
 > Are there areas that appear low but should be high or vice-versa?
 >
 > ## Challenge 2

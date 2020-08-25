@@ -32,6 +32,17 @@ I've chosen to use a generalised additive model for this work because as we saw 
 Loading the `ChickpeaAscoDispersal` library will load the data we previously generated.
 
 
+~~~
+Warning in rgl.init(initValue, onlyNULL): RGL: unable to open X11 display
+~~~
+{: .warning}
+
+
+
+~~~
+Warning: 'rgl.init' failed, running with 'rgl.useNULL = TRUE'.
+~~~
+{: .warning}
 
 ## Create Data Set for GAMs
 
